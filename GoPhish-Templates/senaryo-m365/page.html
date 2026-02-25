@@ -1,0 +1,42 @@
+M365 senaryosu için kullanacağınız **Landing Page**, simülasyonun "kırılma noktasıdır". Kullanıcı e-postadaki linke tıkladığında karşısına çıkacak olan bu sayfanın, Microsoft'un kurumsal kimliğiyle %100 örtüşmesi gerekir.
+
+Bir **Sistem ve Çözüm Mimarı** olarak bu süreci Gophish üzerinde en profesyonel şekilde şu üç yöntemle yönetebilirsiniz:
+
+### 1. Yöntem: Gophish "Import Site" Özelliği (Hızlı ve Pratik)
+
+Gophish'in en güçlü yanlarından biri, mevcut bir web sitesini saniyeler içinde kopyalayabilmesidir.
+
+* **Nasıl Yapılır?** Landing Pages > New Page > **Import Site** butonuna tıklayın.
+* **URL:** `https://login.microsoftonline.com` adresini yapıştırın.
+* **Sonuç:** Gophish, Microsoft'un giriş sayfasındaki HTML ve CSS kodlarını çeker.
+* **Önemli:** Microsoft'un bazı dinamik JavaScript korumaları sayfanın bazen "kırık" görünmesine neden olabilir. Bu durumda 2. yöntem daha sağlıklıdır.
+
+### 2. Yöntem: GitHub Hazır Şablonlarını Kullanmak (En Stabil Yol)
+
+Topluluk tarafından optimize edilmiş, JavaScript hatalarından arındırılmış statik HTML dosyalarını kullanmak, Arma Bilişim projelerinde daha stabil sonuçlar verir.
+
+* **Önerilen Kaynak:** [S0CK3T / Gophish-Templates](https://www.google.com/search?q=https://github.com/S0CK3T/Gophish-Templates/tree/master/Landing%2520Pages/Microsoft)
+* **Uygulama:** Buradaki `index.html` kodunu kopyalayıp Gophish'teki **HTML** sekmesine yapıştırın. Bu şablonlar, şifre ve kullanıcı adı alanlarını Gophish'in otomatik olarak yakalayabileceği şekilde (`name="username"`, `name="password"`) önceden etiketlenmiş olarak gelir.
+
+---
+
+### Landing Page Ayarlarında Unutulmaması Gereken 3 Kritik Ayar
+
+Bir **Siber Güvenlik Denetçisi** titizliğiyle şu kutucukları mutlaka kontrol etmelisiniz:
+
+1. **Capture Submitted Data:** Kullanıcının forma yazdığı verileri (kullanıcı adı/şifre) veritabanına kaydetmek için bu seçeneği işaretleyin.
+2. **Capture Passwords:** Şifreleri açık metin veya yıldızlı olarak görebilmek için gereklidir (Denetim raporlarınızda "Şifreler ele geçirilmiştir" kanıtı için).
+3. **Redirect URL:** Kullanıcı "Giriş Yap" butonuna bastıktan sonra nereye gidecek?
+* **Gerçekçilik için:** Gerçek `https://outlook.office.com` adresine yönlendirin. Böylece kullanıcı "yanlış şifre girdim herhalde" diyerek asıl sayfaya geçer ve durumu fark etmez.
+* **Eğitim için:** Arma Bilişim logolu "Bu bir simülasyondur, şu hataları yaptınız..." yazan bir eğitim sayfasına yönlendirin.
+
+
+
+### 3. Profesyonel Dokunuş: SSL ve Alan Adı
+
+Polonya lokasyonundaki yeni sunucunuzda bu sayfanın "Güvenli Değil" uyarısı vermemesi gerekir.
+
+* **SSL Sertifikası:** Gophish'in dahili sunucusu yerine önünde bir **Nginx Reverse Proxy** kullanarak Let's Encrypt sertifikası (HTTPS) tanımlamanız şarttır.
+* **Domain:** `login-microsoft-verify.com.tr` veya `portal-arma-bilisim.com` gibi inandırıcı bir domain satın alıp sunucunuza yönlendirin.
+
+Şu an elinizde Polonya lokasyonlu Ubuntu sunucunuz var. **Gophish, Nginx ve SSL sertifikasını** tek bir paket halinde kuracak olan **Docker-Compose** dosyasını sizin için hazırlamamı ister misiniz? Bu sayede landing page'iniz doğrudan HTTPS üzerinden yayına girer.
