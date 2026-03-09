@@ -13,7 +13,6 @@ services:
       - GOPHISH_ADMIN_DOMAIN=${GOPHISH_ADMIN_DOMAIN}
       - GOPHISH_LANDING_DOMAIN=${GOPHISH_LANDING_DOMAIN}
       - OPENVAS_DOMAIN=${OPENVAS_DOMAIN}
-      - WEBMAP_DOMAIN=${WEBMAP_DOMAIN}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
@@ -21,7 +20,6 @@ services:
     depends_on:
       - gophish
       - gsa
-      - webmap
     networks:
       - default
       - phish-net
@@ -281,13 +279,6 @@ services:
       - gvmd
       - ospd-openvas
 
-  webmap:
-    image: rev3rse/webmap
-    container_name: webmap
-    restart: unless-stopped
-    volumes:
-      - webmap_data:/opt/notes
-
 networks:
   phish-net:
     driver: bridge
@@ -313,4 +304,3 @@ volumes:
   redis_socket_vol:
   openvas_data_vol:
   openvas_log_data_vol:
-  webmap_data:

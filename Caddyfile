@@ -22,8 +22,3 @@
     encode zstd gzip
     reverse_proxy gsa:80
 }
-
-{$WEBMAP_DOMAIN} {
-    encode zstd gzip
-    reverse_proxy webmap:8080
-}

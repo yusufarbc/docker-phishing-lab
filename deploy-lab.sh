@@ -28,7 +28,7 @@ if ! docker compose pull; then
 	echo "[WARN] Continuing with default stack. Optional services may be skipped."
 fi
 
-echo "[INFO] Starting cyber lab stack (Caddy + Gophish + Postfix + OpenVAS + WebMap)..."
+echo "[INFO] Starting cyber lab stack (Caddy + Gophish + Postfix + OpenVAS)..."
 docker compose up -d
 
 echo "[INFO] Stack started."
@@ -39,7 +39,6 @@ echo "[INFO] Access endpoints:"
 echo "  - Gophish admin  : https://${GOPHISH_ADMIN_DOMAIN}:8443"
 echo "  - Gophish landing: https://${GOPHISH_LANDING_DOMAIN}:8443"
 echo "  - OpenVAS GSA    : https://${OPENVAS_DOMAIN}:8443"
-echo "  - WebMap         : https://${WEBMAP_DOMAIN}:8443"
 echo "[INFO] Note: OpenVAS feed sync and first startup can take a long time."
 
 echo "[INFO] Waiting a few seconds for first-run logs..."
@@ -57,17 +56,6 @@ if [[ -n "${gophish_password}" ]]; then
 else
 	echo "[WARN] Gophish initial password could not be parsed from logs."
 	echo "  - Manual check: docker compose logs --no-color gophish | grep -i 'password'"
-fi
-
-webmap_logs="$(docker compose logs --no-color webmap 2>/dev/null || true)"
-webmap_token_line="$(printf '%s\n' "$webmap_logs" | grep -Ei 'token|auth' | head -n1 || true)"
-
-if [[ -n "${webmap_token_line}" ]]; then
-	echo "[CRED] WebMap possible auth token line"
-	echo "  - ${webmap_token_line}"
-else
-	echo "[WARN] WebMap token/auth line could not be parsed from logs."
-	echo "  - Manual check: docker compose logs --no-color webmap"
 fi
 
 openvas_hint="$(docker compose logs --no-color gvmd 2>/dev/null | grep -Ei 'password|admin' | head -n1 || true)"

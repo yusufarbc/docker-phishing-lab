@@ -10,14 +10,12 @@ Bu yapi ile tum paneller Caddy arkasinda yayinlanir. HTTPS standart `443` yerine
 - `Gophish`: Phishing kampanya yonetimi.
 - `Postfix relay`: Gophish'ten gelen SMTP trafigini kurumsal gateway'e relay eder.
 - `OpenVAS (Greenbone CE)`: Vulnerability scanning ve GSA web arayuzu.
-- `WebMap`: Nmap sonuclarini web dashboard uzerinden gorsellestirme.
 
 Dis erisim akisi:
 
 - `https://GOPHISH_ADMIN_DOMAIN -> caddy -> gophish:3333`
 - `https://GOPHISH_LANDING_DOMAIN -> caddy -> gophish:80`
 - `https://OPENVAS_DOMAIN -> caddy -> gsa:80`
-- `https://WEBMAP_DOMAIN -> caddy -> webmap:8080`
 
 ## 2) On Kosullar
 
@@ -26,7 +24,6 @@ Dis erisim akisi:
 - `GOPHISH_ADMIN_DOMAIN`
 - `GOPHISH_LANDING_DOMAIN`
 - `OPENVAS_DOMAIN`
-- `WEBMAP_DOMAIN`
 - Sunucuda sadece su portlar acik olmali:
 - `80/tcp` (ACME/HTTP challenge)
 - `8443/tcp` (HTTPS panel erisimi)
@@ -59,7 +56,6 @@ Script su adimlari otomatik yapar:
 - Gophish Admin: `https://GOPHISH_ADMIN_DOMAIN:8443`
 - Gophish Landing: `https://GOPHISH_LANDING_DOMAIN:8443`
 - OpenVAS GSA: `https://OPENVAS_DOMAIN:8443`
-- WebMap: `https://WEBMAP_DOMAIN:8443`
 
 Notlar:
 
