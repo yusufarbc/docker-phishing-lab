@@ -51,6 +51,12 @@ Script su adimlari otomatik yapar:
 - Tum image'larin cekilmesi
 - Tum stack'in ayağa kaldirilmasi
 
+OpenVAS'siz alternatif:
+
+- Ayrica `no-openvas/` klasoru altinda sadece `Caddy + Gophish + Postfix` iceren ayri compose yapisi bulunur.
+- Kullanmak icin `no-openvas/` klasorune gecip `.env.example` dosyasini `.env` olarak kopyalayin.
+- Baslatma komutu: `bash deploy-lite.sh`
+
 ## 4) Erişim
 
 - Gophish Admin: `https://GOPHISH_ADMIN_DOMAIN:8443`
