@@ -36,6 +36,11 @@ fi
 echo "[INFO] Starting cyber lab stack (Caddy + Gophish + Postfix + OpenVAS)..."
 docker compose up -d
 
+echo "[INFO] Configuring Gophish for reverse proxy mode..."
+docker compose exec gophish sh -lc "sed -i -E 's/\"use_tls\": *true/\"use_tls\": false/' /opt/gophish/config.json"
+docker compose exec gophish sh -lc "sed -i -E 's#\"trusted_origins\": *\[[^]]*\]#\"trusted_origins\": [\"https://${GOPHISH_ADMIN_DOMAIN}:8443\",\"https://${GOPHISH_ADMIN_DOMAIN}\"]#' /opt/gophish/config.json || true"
+docker compose restart gophish caddy >/dev/null
+
 echo "[INFO] Stack started."
 echo "[INFO] Status:"
 docker compose ps
@@ -55,9 +60,9 @@ gophish_password=""
 for i in $(seq 1 12); do
 	gophish_logs="$(docker compose logs --no-color gophish 2>/dev/null || true)"
 	gophish_password="$(printf '%s\n' "$gophish_logs" | sed -nE \
-		-e 's/.*username admin and the password ([^ ]+).*/\1/p' \
-		-e 's/.*password for.*admin[^:]*:[[:space:]]*([^ ]+).*/\1/p' \
-		-e 's/.*admin password[[:space:]]*:[[:space:]]*([^ ]+).*/\1/p' | head -n1)"
+		-e 's/.*username admin and the password ([^\" ]+).*/\1/p' \
+		-e 's/.*password for.*admin[^:]*:[[:space:]]*([^\" ]+).*/\1/p' \
+		-e 's/.*admin password[[:space:]]*:[[:space:]]*([^\" ]+).*/\1/p' | head -n1)"
 
 	if [[ -n "${gophish_password}" ]]; then
 		break
