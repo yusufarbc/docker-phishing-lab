@@ -27,8 +27,3 @@
     encode zstd gzip
     reverse_proxy webmap:8080
 }
-
-{$SN1PER_DOMAIN} {
-    encode zstd gzip
-    reverse_proxy sn1per:8888
-}

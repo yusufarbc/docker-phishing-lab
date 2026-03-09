@@ -14,7 +14,6 @@ services:
       - GOPHISH_LANDING_DOMAIN=${GOPHISH_LANDING_DOMAIN}
       - OPENVAS_DOMAIN=${OPENVAS_DOMAIN}
       - WEBMAP_DOMAIN=${WEBMAP_DOMAIN}
-      - SN1PER_DOMAIN=${SN1PER_DOMAIN}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
@@ -23,7 +22,6 @@ services:
       - gophish
       - gsa
       - webmap
-      - sn1per
     networks:
       - default
       - phish-net
@@ -289,13 +287,6 @@ services:
     restart: unless-stopped
     volumes:
       - webmap_data:/opt/notes
-
-  sn1per:
-    image: xerosecurity/sn1per
-    container_name: sn1per
-    restart: unless-stopped
-    stdin_open: true
-    tty: true
 
 networks:
   phish-net:

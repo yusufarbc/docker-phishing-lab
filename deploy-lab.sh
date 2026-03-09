@@ -23,9 +23,12 @@ echo "[INFO] Validating docker compose configuration..."
 docker compose config >/dev/null
 
 echo "[INFO] Pulling latest images..."
-docker compose pull
+if ! docker compose pull; then
+	echo "[WARN] Some images could not be pulled."
+	echo "[WARN] Continuing with default stack. Optional services may be skipped."
+fi
 
-echo "[INFO] Starting cyber lab stack (Gophish + OpenVAS + Caddy)..."
+echo "[INFO] Starting cyber lab stack (Caddy + Gophish + Postfix + OpenVAS + WebMap)..."
 docker compose up -d
 
 echo "[INFO] Stack started."
@@ -37,7 +40,6 @@ echo "  - Gophish admin  : https://${GOPHISH_ADMIN_DOMAIN}:8443"
 echo "  - Gophish landing: https://${GOPHISH_LANDING_DOMAIN}:8443"
 echo "  - OpenVAS GSA    : https://${OPENVAS_DOMAIN}:8443"
 echo "  - WebMap         : https://${WEBMAP_DOMAIN}:8443"
-echo "  - Sn1per CE      : https://${SN1PER_DOMAIN}:8443"
 echo "[INFO] Note: OpenVAS feed sync and first startup can take a long time."
 
 echo "[INFO] Waiting a few seconds for first-run logs..."
