@@ -15,7 +15,7 @@ Dis erisim akisi:
 
 - `https://GOPHISH_ADMIN_DOMAIN -> caddy -> gophish:3333`
 - `https://GOPHISH_LANDING_DOMAIN -> caddy -> gophish:80`
-- `https://OPENVAS_DOMAIN -> caddy -> gsa:80`
+- `https://OPENVAS_DOMAIN -> caddy -> gsa:9392`
 
 ## 2) On Kosullar
 
