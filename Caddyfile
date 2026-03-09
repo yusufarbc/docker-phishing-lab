@@ -1,0 +1,34 @@
+{
+    email {$ACME_EMAIL}
+    http_port 80
+    https_port 8443
+}
+
+{$GOPHISH_ADMIN_DOMAIN} {
+    encode zstd gzip
+    reverse_proxy https://gophish:3333 {
+        transport http {
+            tls_insecure_skip_verify
+        }
+    }
+}
+
+{$GOPHISH_LANDING_DOMAIN} {
+    encode zstd gzip
+    reverse_proxy gophish:80
+}
+
+{$OPENVAS_DOMAIN} {
+    encode zstd gzip
+    reverse_proxy gsa:80
+}
+
+{$WEBMAP_DOMAIN} {
+    encode zstd gzip
+    reverse_proxy webmap:8080
+}
+
+{$SN1PER_DOMAIN} {
+    encode zstd gzip
+    reverse_proxy sn1per:8888
+}
