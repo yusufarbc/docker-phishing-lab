@@ -19,6 +19,11 @@ if [[ ! -f ".env" ]]; then
   exit 1
 fi
 
+# Export .env values for script output variables.
+set -a
+. ./.env
+set +a
+
 echo "[INFO] Validating docker compose configuration..."
 docker compose config >/dev/null
 
@@ -35,11 +40,29 @@ echo "[INFO] Access endpoints:"
 echo "  - Gophish admin  : https://${GOPHISH_ADMIN_DOMAIN}:8443"
 echo "  - Gophish landing: https://${GOPHISH_LANDING_DOMAIN}:8443"
 
-gophish_logs="$(docker compose logs --no-color gophish 2>/dev/null || true)"
-gophish_password="$(printf '%s\n' "$gophish_logs" | sed -nE 's/.*username admin and the password ([^ ]+).*/\1/p' | head -n1)"
+echo "[INFO] Attempting to extract Gophish initial password from logs..."
+
+gophish_password=""
+for i in $(seq 1 12); do
+  gophish_logs="$(docker compose logs --no-color gophish 2>/dev/null || true)"
+  gophish_password="$(printf '%s\n' "$gophish_logs" | sed -nE \
+    -e 's/.*username admin and the password ([^ ]+).*/\1/p' \
+    -e 's/.*password for.*admin[^:]*:[[:space:]]*([^ ]+).*/\1/p' \
+    -e 's/.*admin password[[:space:]]*:[[:space:]]*([^ ]+).*/\1/p' | head -n1)"
+
+  if [[ -n "${gophish_password}" ]]; then
+    break
+  fi
+
+  sleep 5
+done
 
 if [[ -n "${gophish_password}" ]]; then
   echo "[CRED] Gophish initial admin"
   echo "  - Username: admin"
   echo "  - Password: ${gophish_password}"
+else
+  echo "[WARN] Gophish initial password could not be parsed from logs."
+  echo "  - If this is not first install, password line will not be printed again."
+  echo "  - Manual check: docker compose logs --no-color gophish | grep -Ei 'password|admin'"
 fi

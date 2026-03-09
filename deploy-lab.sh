@@ -19,6 +19,11 @@ if [[ ! -f ".env" ]]; then
 	exit 1
 fi
 
+# Export .env values for script output variables.
+set -a
+. ./.env
+set +a
+
 echo "[INFO] Validating docker compose configuration..."
 docker compose config >/dev/null
 
@@ -46,8 +51,20 @@ sleep 8
 
 echo "[INFO] Attempting to extract initial credentials from logs..."
 
-gophish_logs="$(docker compose logs --no-color gophish 2>/dev/null || true)"
-gophish_password="$(printf '%s\n' "$gophish_logs" | sed -nE 's/.*username admin and the password ([^ ]+).*/\1/p' | head -n1)"
+gophish_password=""
+for i in $(seq 1 12); do
+	gophish_logs="$(docker compose logs --no-color gophish 2>/dev/null || true)"
+	gophish_password="$(printf '%s\n' "$gophish_logs" | sed -nE \
+		-e 's/.*username admin and the password ([^ ]+).*/\1/p' \
+		-e 's/.*password for.*admin[^:]*:[[:space:]]*([^ ]+).*/\1/p' \
+		-e 's/.*admin password[[:space:]]*:[[:space:]]*([^ ]+).*/\1/p' | head -n1)"
+
+	if [[ -n "${gophish_password}" ]]; then
+		break
+	fi
+
+	sleep 5
+done
 
 if [[ -n "${gophish_password}" ]]; then
 	echo "[CRED] Gophish initial admin"
@@ -55,7 +72,8 @@ if [[ -n "${gophish_password}" ]]; then
 	echo "  - Password: ${gophish_password}"
 else
 	echo "[WARN] Gophish initial password could not be parsed from logs."
-	echo "  - Manual check: docker compose logs --no-color gophish | grep -i 'password'"
+	echo "  - If this is not first install, password line will not be printed again."
+	echo "  - Manual check: docker compose logs --no-color gophish | grep -Ei 'password|admin'"
 fi
 
 openvas_hint="$(docker compose logs --no-color gvmd 2>/dev/null | grep -Ei 'password|admin' | head -n1 || true)"
