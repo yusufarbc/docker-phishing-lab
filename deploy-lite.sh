@@ -30,7 +30,7 @@ docker compose config >/dev/null
 echo "[INFO] Pulling latest images..."
 docker compose pull
 
-echo "[INFO] Starting lite stack (Caddy + Gophish + Postfix)..."
+echo "[INFO] Starting phishing lab stack (Caddy + Gophish + Postfix)..."
 docker compose up -d
 
 echo "[INFO] Configuring Gophish for reverse proxy mode..."

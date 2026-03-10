@@ -18,8 +18,3 @@
     encode zstd gzip
     reverse_proxy gophish:80
 }
-
-{$OPENVAS_DOMAIN} {
-    encode zstd gzip
-    reverse_proxy gsa:9392
-}

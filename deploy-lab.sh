@@ -30,10 +30,10 @@ docker compose config >/dev/null
 echo "[INFO] Pulling latest images..."
 if ! docker compose pull; then
 	echo "[WARN] Some images could not be pulled."
-	echo "[WARN] Continuing with default stack. Optional services may be skipped."
+	echo "[WARN] Continuing with default stack."
 fi
 
-echo "[INFO] Starting cyber lab stack (Caddy + Gophish + Postfix + OpenVAS)..."
+echo "[INFO] Starting phishing lab stack (Caddy + Gophish + Postfix)..."
 docker compose up -d
 
 echo "[INFO] Configuring Gophish for reverse proxy mode..."
@@ -48,8 +48,6 @@ docker compose ps
 echo "[INFO] Access endpoints:"
 echo "  - Gophish admin  : https://${GOPHISH_ADMIN_DOMAIN}:8443"
 echo "  - Gophish landing: https://${GOPHISH_LANDING_DOMAIN}:8443"
-echo "  - OpenVAS GSA    : https://${OPENVAS_DOMAIN}:8443"
-echo "[INFO] Note: OpenVAS feed sync and first startup can take a long time."
 
 echo "[INFO] Waiting a few seconds for first-run logs..."
 sleep 8
@@ -81,12 +79,3 @@ else
 	echo "  - Manual check: docker compose logs --no-color gophish | grep -Ei 'password|admin'"
 fi
 
-openvas_hint="$(docker compose logs --no-color gvmd 2>/dev/null | grep -Ei 'password|admin' | head -n1 || true)"
-if [[ -n "${openvas_hint}" ]]; then
-	echo "[INFO] OpenVAS related credential hint from gvmd logs"
-	echo "  - ${openvas_hint}"
-else
-	echo "[INFO] OpenVAS admin password was not found in logs (this is common)."
-	echo "  - Check users manually after startup:"
-	echo "    docker compose exec gvmd gvmd --get-users"
-fi
