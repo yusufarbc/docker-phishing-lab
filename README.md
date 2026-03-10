@@ -1,115 +1,91 @@
-# PhishBox-Spoofer
+# Cyber Lab (Gophish + OpenVAS + Caddy)
 
-Yetkili güvenlik farkındalık testleri için, Gophish + yerel SMTP relay (Postfix) tabanlı, izole Docker mimarisi.
+Yetkili guvenlik testleri icin tek bir Docker stack: `Gophish + Postfix relay + OpenVAS (Greenbone CE) + Caddy reverse proxy`.
 
-## 1) Teknik Mimari Özeti
+Bu yapi ile tum paneller Caddy arkasinda yayinlanir. HTTPS standart `443` yerine `8443` uzerinden acilir; dis dunyada sadece `80` ve `8443` acik kalir.
 
-Trafik akışı:
+## 1) Mimari
 
-`Gophish -> Yerel Postfix Relay -> Hedef Kurum Mail Gateway -> Hedef Kullanıcı`
+- `Caddy`: TLS/SSL terminasyonu, domain routing, otomatik Let's Encrypt sertifikasi.
+- `Gophish`: Phishing kampanya yonetimi.
+- `Postfix relay`: Gophish'ten gelen SMTP trafigini kurumsal gateway'e relay eder.
+- `OpenVAS (Greenbone CE)`: Vulnerability scanning ve GSA web arayuzu.
 
-- **Gophish**: Kampanya yönetimi, şablon, takip ve raporlama.
-- **Postfix Relay**: Gophish'ten gelen SMTP trafiğini kurumsal gateway'e iletme.
-- **Özel Docker ağı**: Gophish ve Postfix sadece kendi izole ağında haberleşir.
-- **Port tasarımı**:
-  - Admin panel: `3333`
-	- Landing/listener dış erişim: `60888` (sunucudaki 80 portu çakışmasını önler)
-- **Kalıcılık (persistency)**: Gophish verisi (`gophish.db` dahil) named volume üzerinde tutulur.
+Dis erisim akisi:
 
-## 2) Ön Koşullar
+- `https://GOPHISH_ADMIN_DOMAIN -> caddy -> gophish:3333`
+- `https://GOPHISH_LANDING_DOMAIN -> caddy -> gophish:80`
+- `https://OPENVAS_DOMAIN -> caddy -> gsa:9392`
+
+## 2) On Kosullar
 
 - Docker Engine + Docker Compose plugin
-- Sunucu üzerinde aşağıdaki portlara kontrollü erişim:
-  - `3333/tcp` (sadece yönetim IP'leri)
-	- `60888/tcp` (test senaryosuna göre)
-- Yazılı yetki, kapsam dokümanı ve onaylı test penceresi (change window)
+- DNS A/AAAA kayitlari sunucuya yonlenmis olmali:
+- `GOPHISH_ADMIN_DOMAIN`
+- `GOPHISH_LANDING_DOMAIN`
+- `OPENVAS_DOMAIN`
+- Sunucuda sadece su portlar acik olmali:
+- `80/tcp` (ACME/HTTP challenge)
+- `8443/tcp` (HTTPS panel erisimi)
 
-## 3) Kurulum ve Ayağa Kaldırma
+## 3) Kurulum (Tek Script)
 
-1. Proje dizinine geçin.
-2. Servisleri başlatın:
-
-```bash
-docker compose up -d
-```
-
-3. Durumu doğrulayın:
+1. Ortam dosyasini hazirlayin:
 
 ```bash
-docker compose ps
-docker compose logs -f gophish
-docker compose logs -f postfix
+cp .env.example .env
 ```
 
-4. Erişim:
-	- Gophish Admin: `https://SUNUCU_IP:3333` (self-signed sertifika nedeniyle tarayıcı uyarısı görebilirsiniz)
-	- Landing/listener: `http://SUNUCU_IP:60888`
+2. `.env` dosyasini gercek degerlerle guncelleyin.
 
-## 4) Gophish Sending Profile Ayarları
+3. Tek komutla stack'i kaldirin:
 
-Gophish panelinde `Sending Profiles` oluştururken:
+```bash
+bash deploy-lab.sh
+```
 
-- **Name**: `Local-Postfix-Relay`
-- **From**: Test senaryosunda onaylı gönderici adresi
-- **Host**: `postfix-relay:25`  
-  (alternatif ifade: Postfix konteyner IP'si `172.29.0.20:25`)
-- **Username / Password**: Relay politikasına göre boş veya kimlik doğrulamalı
-- **Ignore Certificate Errors**: TLS topolojisine göre değerlendirin
+Script su adimlari otomatik yapar:
 
-Not: Bu kurulumda Postfix yalnızca Gophish konteynerinden (`172.29.0.10`) gelen SMTP trafiğini kabul edecek şekilde sınırlandırılmıştır.
+- Docker ve compose kontrolu
+- `docker compose config` ile dogrulama
+- Tum image'larin cekilmesi
+- Tum stack'in ayağa kaldirilmasi
 
-## 5) Kurumsal Teknik Ekip Yönergesi (Kontrollü İstisna Yönetimi)
+OpenVAS'siz alternatif:
 
-Bu bölüm, yalnızca **onaylı simülasyon penceresi** için geçici ve izlenebilir istisna (exception) tanımlarını kapsar.
+- Ayrica `no-openvas/` klasoru altinda sadece `Caddy + Gophish + Postfix` iceren ayri compose yapisi bulunur.
+- Kullanmak icin `no-openvas/` klasorune gecip `.env.example` dosyasini `.env` olarak kopyalayin.
+- Baslatma komutu: `bash deploy-lite.sh`
 
-### 5.1 E-posta Geçidi (Exchange / M365 / SEG)
+## 4) Erişim
 
-Teknik ekipten aşağıdaki kontrollü istisnaları isteyin:
+- Gophish Admin: `https://GOPHISH_ADMIN_DOMAIN:8443`
+- Gophish Landing: `https://GOPHISH_LANDING_DOMAIN:8443`
+- OpenVAS GSA: `https://OPENVAS_DOMAIN:8443`
 
-1. **Kaynak IP Allowlist (Scoped)**
-	- Sadece simülasyon sunucusunun sabit çıkış IP'si
-	- Sadece onaylı tarih/saat aralığı
-	- Sadece onaylı alıcı grupları
+Notlar:
 
-2. **Spoofing Koruma İstisnası (Scoped Exception)**
-	- Tam bypass yerine, yalnızca test kampanyası kapsamındaki:
-	  - belirli gönderen pattern'leri,
-	  - belirli hedef grup,
-	  - belirli zaman penceresi
-	- Tüm eşleşmeler SIEM'e loglanmalı ve change kaydı ile ilişkilendirilmeli
+- OpenVAS ilk acilista feed sync nedeniyle uzun sure baslangicta kalabilir.
+- Caddy sertifikayi ilk isteklerde alacagi icin DNS ve port yonlendirmesi dogru olmalidir.
 
-3. **Anti-Phishing / Anti-Spam Politika İstisnası (Minimum Scope)**
-	- Genel politika kapatma yapılmaz
-	- Sadece kampanya göstergelerine özel kural uygulanır
+## 5) Gophish Sending Profile
 
-### 5.2 Web Güvenlik Geçidi / URL Filtreleme
+Gophish panelinde `Sending Profiles` olustururken:
 
-1. **Landing URL İstisnası (Minimum Scope)**
-	- Sadece onaylı simülasyon URL/FQDN/port (`:60888`) için
-	- Sadece hedef kullanıcı grubu için
-	- Süreli (auto-expire) kural
+- Name: `Local-Postfix-Relay`
+- Host: `postfix-relay:25`
+- Username/Password: Relay politikaniza gore
 
-2. **TLS Inspection / Sandbox Davranışı**
-	- Simülasyon URL'sinde yanlış pozitifleri azaltacak scoped kural
-	- Test bitiminde otomatik geri alma
+Guvenlik notu: Postfix varsayilan olarak sadece Gophish konteynerinden (`172.29.0.10`) SMTP kabul edecek sekilde sinirlandirilmistir.
 
-3. **Doğrulama ve Geri Dönüş Planı**
-	- Kural öncesi/sonrası test kanıtı
-	- Rollback komutu/prosedürü
-	- Kural sahibi, bitiş zamanı ve kapatma onayı
+## 6) Operasyonel Guvenlik
 
-## 6) Operasyonel Güvenlik (Best Practices)
+- Caddy disinda panel portlari host'a publish edilmez (3333/9392 kapali).
+- Tum paneller Caddy arkasinda oldugu icin dis dunyaya sadece `80` ve `8443` acik kalir.
+- Yonetim domainleri icin ek olarak IP allowlist/WAF tavsiye edilir.
+- Admin hesaplarinda guclu parola ve mumkunse MFA kullanin.
+- Test bitince gecici allowlist/exception kurallarini kaldirin.
 
-- `3333` portunu internete açık bırakmayın; IP kısıtı/VPN arkasında tutun.
-- Admin parolalarını ilk girişte değiştirin; mümkünse MFA veya bastion erişimi kullanın.
-- Container image güncellemelerini kontrollü geçirin (`docker compose pull`).
-- Logları merkezi sisteme (SIEM) aktarın ve kampanya sonunda kanıt arşivleyin.
-- Test sonrası tüm geçici istisnaları kaldırın ve kapanış raporu üretin.
+## 7) Yasal Uyari
 
-## 7) Yasal Uyarı (Disclaimer)
-
-Bu proje ve içerdiği yapılandırmalar yalnızca **yazılı olarak yetkilendirilmiş** sızma testi, kırmızı takım ve güvenlik farkındalık simülasyonlarında kullanılabilir. Yetkisiz kullanım, kimlik avı saldırısı, aldatma amaçlı e-posta gönderimi veya üçüncü taraf sistemlerde izinsiz test faaliyetleri hukuka aykırıdır ve kullanıcı/uygulayıcı sorumluluğundadır.
-
-## 8) Referans
-
-- Gophish Docker image: https://hub.docker.com/r/gophish/gophish/
+Bu proje yalnizca yazili olarak yetkilendirilmis guvenlik testleri icin kullanilmalidir. Yetkisiz kullanim hukuka aykiridir ve tum sorumluluk uygulayiciya aittir.
