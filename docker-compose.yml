@@ -1,9 +1,9 @@
-name: cyber-lab-lite
+name: phishing-lab
 
 services:
   caddy:
     image: caddy:2-alpine
-    container_name: caddy-lite
+    container_name: caddy-lab
     restart: unless-stopped
     ports:
       - "80:80"
@@ -24,7 +24,7 @@ services:
 
   gophish:
     image: gophish/gophish:latest
-    container_name: gophish-lite
+    container_name: gophish-lab
     restart: unless-stopped
     networks:
       phish-net:
@@ -34,7 +34,7 @@ services:
 
   postfix:
     image: mwader/postfix-relay:latest
-    container_name: postfix-relay-lite
+    container_name: postfix-relay-lab
     restart: unless-stopped
     environment:
       - POSTFIX_myhostname=simulasyon.local
