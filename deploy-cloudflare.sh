@@ -39,15 +39,15 @@ mkdir -p "$(dirname "${CLOUDFLARE_ORIGIN_CERT_PATH}")"
 mkdir -p "$(dirname "${CLOUDFLARE_ORIGIN_KEY_PATH}")"
 
 if [[ -d "${CLOUDFLARE_ORIGIN_CERT_PATH}" ]]; then
-  echo "[ERROR] Expected certificate file but found directory: ${CLOUDFLARE_ORIGIN_CERT_PATH}"
-  echo "        Remove directory and create PEM file at this path."
-  exit 1
+  echo "[WARN] Expected certificate file but found directory: ${CLOUDFLARE_ORIGIN_CERT_PATH}"
+  echo "       Auto-removing empty directory to fix Docker mount issue."
+  rm -rf "${CLOUDFLARE_ORIGIN_CERT_PATH}"
 fi
 
 if [[ -d "${CLOUDFLARE_ORIGIN_KEY_PATH}" ]]; then
-  echo "[ERROR] Expected private key file but found directory: ${CLOUDFLARE_ORIGIN_KEY_PATH}"
-  echo "        Remove directory and create PEM file at this path."
-  exit 1
+  echo "[WARN] Expected private key file but found directory: ${CLOUDFLARE_ORIGIN_KEY_PATH}"
+  echo "       Auto-removing empty directory to fix Docker mount issue."
+  rm -rf "${CLOUDFLARE_ORIGIN_KEY_PATH}"
 fi
 
 missing_files=0
