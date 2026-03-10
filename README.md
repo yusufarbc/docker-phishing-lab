@@ -1,6 +1,52 @@
-# Phishing Lab (Gophish + Postfix + Caddy)
+# Phishing Lab (Gophish + Postfix)
 
-Yetkili guvenlik testleri icin tek bir Docker stack: `Gophish + Postfix relay + Caddy reverse proxy`.
+Yetkili guvenlik testleri icin Docker stack: `Gophish + Postfix relay`.
+
+Bu repo artik 3 farkli calisma modu sunar:
+
+- `docker-compose.yml`: Caddy reverse proxy (domain + otomatik TLS)
+- `docker-compose.local.yml`: Local test (Caddy yok, HTTP)
+- `docker-compose.cloudflare.yml`: Cloudflare Full/Full(strict) (Caddy yok, GoPhish origin cert ile HTTPS)
+
+## Hizli Baslangic (Mod Secimi)
+
+### 1) Local/client makine (en kolay)
+
+```bash
+bash deploy-local.sh
+```
+
+- Admin: `http://localhost:3333`
+- Landing: `http://localhost:8080`
+
+### 2) Sunucu + Cloudflare Full/Full(strict) + Caddy yok
+
+1. Cloudflare'dan `Origin Certificate` olusturun (admin ve landing domain dahil).
+2. Dosyalari sunucuda `./certs/cloudflare-origin.crt` ve `./certs/cloudflare-origin.key` olarak kaydedin.
+3. `.env` icinde sertifika yollarini doldurun:
+
+```env
+CLOUDFLARE_ORIGIN_CERT_PATH=./certs/cloudflare-origin.crt
+CLOUDFLARE_ORIGIN_KEY_PATH=./certs/cloudflare-origin.key
+```
+
+4. Deploy:
+
+```bash
+bash deploy-cloudflare.sh
+```
+
+Cloudflare ayarlari:
+
+- SSL/TLS mode: `Full` veya `Full (strict)`
+- DNS kayitlari `Proxied` (turuncu bulut)
+- Sunucuda `80/tcp` ve `443/tcp` acik olmali
+
+### 3) Sunucu + Caddy (eski mimari)
+
+```bash
+bash deploy-lab.sh
+```
 
 Bu yapi ile tum paneller Caddy arkasinda yayinlanir. HTTPS standart `443` yerine `8443` uzerinden acilir; dis dunyada sadece `80` ve `8443` acik kalir.
 

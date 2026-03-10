@@ -1,0 +1,38 @@
+name: phishing-lab-local
+
+services:
+  gophish:
+    image: gophish/gophish:latest
+    container_name: gophish-lab
+    restart: unless-stopped
+    ports:
+      - "3333:3333"
+      - "8080:80"
+    networks:
+      phish-net:
+        ipv4_address: 172.30.0.10
+    volumes:
+      - gophish_data:/opt/gophish
+
+  postfix:
+    image: mwader/postfix-relay:latest
+    container_name: postfix-relay-lab
+    restart: unless-stopped
+    environment:
+      - POSTFIX_myhostname=simulasyon.local
+      - POSTFIX_mynetworks=127.0.0.0/8,172.30.0.10/32
+      - POSTFIX_relayhost=[159.253.46.182]:587
+      - POSTFIX_smtpd_recipient_restrictions=permit_mynetworks,reject
+    networks:
+      phish-net:
+        ipv4_address: 172.30.0.20
+
+networks:
+  phish-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
+
+volumes:
+  gophish_data:
