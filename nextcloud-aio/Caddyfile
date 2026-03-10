@@ -8,17 +8,7 @@
 nextcloud.arnnabilisim.com.tr {
     # Nextcloud AIO Apache kabı için ters proxy ayarı
     # Apache varsayılan olarak 11000 nolu portu kullanır
-    reverse_proxy nextcloud-aio-mastercontainer:11000 {
-        header_up Host {host}
-        header_up X-Real-IP {remote_host}
-        header_up X-Forwarded-For {remote_host}
-        header_up X-Forwarded-Proto {scheme}
-    }
-    
-    # AIO Arayüzüne 443 üzerinden /aio yoluyla erişmek isterseniz:
-    # handle_path /aio* {
-    #     reverse_proxy nextcloud-aio-mastercontainer:8080
-    # }
+    reverse_proxy nextcloud-aio-mastercontainer:11000
     
     # Header ayarları (iOS ve Safari uyumluluğu için önerilir)
     header {
