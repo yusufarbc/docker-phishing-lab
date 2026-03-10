@@ -33,13 +33,29 @@ docker compose pull
 echo "[INFO] Starting phishing lab stack (Caddy + Gophish + Postfix)..."
 docker compose up -d
 
-echo "[INFO] Configuring Gophish for reverse proxy mode (via offline patch to bypass container limits)..."
-# Konteyner icinde gerekli toollar olmadigi icin config disari alinarak duzenlenir
+echo "[INFO] Configuring Gophish for reverse proxy mode (via offline Python patch for accurate JSON parsing)..."
 docker compose cp gophish:/opt/gophish/config.json ./tmp_config.json
 
-# use_tls ve trusted_origins degerlerini kalici olarak guncelleyelim
-sed -i -E 's/"use_tls": *true/"use_tls": false/' ./tmp_config.json
-sed -i -E "s#\"trusted_origins\": *\\[[^\\]]*\\]#\"trusted_origins\": [\"https://${GOPHISH_ADMIN_DOMAIN}\",\"http://${GOPHISH_ADMIN_DOMAIN}\",\"https://${GOPHISH_LANDING_DOMAIN}\"]#" ./tmp_config.json
+python3 -c "
+import json, os
+
+with open('./tmp_config.json', 'r') as f:
+    data = json.load(f)
+
+data['admin_server']['use_tls'] = False
+domain = '${GOPHISH_ADMIN_DOMAIN}'
+landing = '${GOPHISH_LANDING_DOMAIN}'
+
+data['admin_server']['trusted_origins'] = [
+    f'https://{domain}',
+    f'http://{domain}',
+    f'{domain}',
+    f'https://{landing}'
+]
+
+with open('./tmp_config.json', 'w') as f:
+    json.dump(data, f, indent=4)
+"
 
 docker compose cp ./tmp_config.json gophish:/opt/gophish/config.json
 rm -f ./tmp_config.json
