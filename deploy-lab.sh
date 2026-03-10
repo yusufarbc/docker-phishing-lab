@@ -33,9 +33,17 @@ docker compose pull
 echo "[INFO] Starting phishing lab stack (Caddy + Gophish + Postfix)..."
 docker compose up -d
 
-echo "[INFO] Configuring Gophish for reverse proxy mode..."
-docker compose exec gophish sh -lc "sed -i -E 's/\"use_tls\": *true/\"use_tls\": false/' /opt/gophish/config.json"
-docker compose exec gophish sh -lc "sed -i -E 's#\"trusted_origins\": *\[[^]]*\]#\"trusted_origins\": [\"https://${GOPHISH_ADMIN_DOMAIN}\",\"https://${GOPHISH_ADMIN_DOMAIN}:443\",\"http://${GOPHISH_ADMIN_DOMAIN}\",\"http://${GOPHISH_ADMIN_DOMAIN}:80\",\"https://${GOPHISH_LANDING_DOMAIN}\",\"https://${GOPHISH_LANDING_DOMAIN}:443\"]#' /opt/gophish/config.json || true"
+echo "[INFO] Configuring Gophish for reverse proxy mode (via offline patch to bypass container limits)..."
+# Konteyner icinde gerekli toollar olmadigi icin config disari alinarak duzenlenir
+docker compose cp gophish:/opt/gophish/config.json ./tmp_config.json
+
+# use_tls ve trusted_origins degerlerini kalici olarak guncelleyelim
+sed -i -E 's/"use_tls": *true/"use_tls": false/' ./tmp_config.json
+sed -i -E "s#\"trusted_origins\": *\\[[^\\]]*\\]#\"trusted_origins\": [\"https://${GOPHISH_ADMIN_DOMAIN}\",\"http://${GOPHISH_ADMIN_DOMAIN}\",\"https://${GOPHISH_LANDING_DOMAIN}\"]#" ./tmp_config.json
+
+docker compose cp ./tmp_config.json gophish:/opt/gophish/config.json
+rm -f ./tmp_config.json
+
 docker compose restart gophish caddy >/dev/null
 
 echo "[INFO] Status:"
