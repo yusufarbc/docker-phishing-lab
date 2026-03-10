@@ -19,22 +19,46 @@ if [[ ! -f ".env" ]]; then
   exit 1
 fi
 
+# Ensure default Cloudflare cert paths exist in .env for a smoother first run.
+if ! grep -q '^CLOUDFLARE_ORIGIN_CERT_PATH=' .env; then
+  echo 'CLOUDFLARE_ORIGIN_CERT_PATH=./certs/cloudflare-origin.crt' >> .env
+fi
+
+if ! grep -q '^CLOUDFLARE_ORIGIN_KEY_PATH=' .env; then
+  echo 'CLOUDFLARE_ORIGIN_KEY_PATH=./certs/cloudflare-origin.key' >> .env
+fi
+
 set -a
 . ./.env
 set +a
 
-if [[ -z "${CLOUDFLARE_ORIGIN_CERT_PATH:-}" || -z "${CLOUDFLARE_ORIGIN_KEY_PATH:-}" ]]; then
-  echo "[ERROR] CLOUDFLARE_ORIGIN_CERT_PATH and CLOUDFLARE_ORIGIN_KEY_PATH must be set in .env"
+CLOUDFLARE_ORIGIN_CERT_PATH="${CLOUDFLARE_ORIGIN_CERT_PATH:-./certs/cloudflare-origin.crt}"
+CLOUDFLARE_ORIGIN_KEY_PATH="${CLOUDFLARE_ORIGIN_KEY_PATH:-./certs/cloudflare-origin.key}"
+
+mkdir -p "$(dirname "${CLOUDFLARE_ORIGIN_CERT_PATH}")"
+mkdir -p "$(dirname "${CLOUDFLARE_ORIGIN_KEY_PATH}")"
+
+if [[ -d "${CLOUDFLARE_ORIGIN_CERT_PATH}" ]]; then
+  echo "[ERROR] Expected certificate file but found directory: ${CLOUDFLARE_ORIGIN_CERT_PATH}"
+  echo "        Remove directory and create PEM file at this path."
+  exit 1
+fi
+
+if [[ -d "${CLOUDFLARE_ORIGIN_KEY_PATH}" ]]; then
+  echo "[ERROR] Expected private key file but found directory: ${CLOUDFLARE_ORIGIN_KEY_PATH}"
+  echo "        Remove directory and create PEM file at this path."
   exit 1
 fi
 
 if [[ ! -f "${CLOUDFLARE_ORIGIN_CERT_PATH}" ]]; then
   echo "[ERROR] Origin certificate file not found: ${CLOUDFLARE_ORIGIN_CERT_PATH}"
+  echo "        Create file and paste Cloudflare Origin Certificate PEM content."
   exit 1
 fi
 
 if [[ ! -f "${CLOUDFLARE_ORIGIN_KEY_PATH}" ]]; then
   echo "[ERROR] Origin private key file not found: ${CLOUDFLARE_ORIGIN_KEY_PATH}"
+  echo "        Create file and paste Cloudflare Origin Private Key PEM content."
   exit 1
 fi
 
