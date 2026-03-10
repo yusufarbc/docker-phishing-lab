@@ -115,13 +115,13 @@ trusted_origins = [
 ]
 
 data['admin_server']['use_tls'] = True
-data['admin_server']['listen_url'] = '0.0.0.0:443'
+data['admin_server']['listen_url'] = '0.0.0.0:8443'
 data['admin_server']['cert_path'] = '/opt/gophish/cloudflare-origin.crt'
 data['admin_server']['key_path'] = '/opt/gophish/cloudflare-origin.key'
 data['admin_server']['trusted_origins'] = trusted_origins
 
 data['phish_server']['use_tls'] = True
-data['phish_server']['listen_url'] = '0.0.0.0:80'
+data['phish_server']['listen_url'] = '0.0.0.0:443'
 data['phish_server']['cert_path'] = '/opt/gophish/cloudflare-origin.crt'
 data['phish_server']['key_path'] = '/opt/gophish/cloudflare-origin.key'
 
@@ -138,7 +138,7 @@ echo "[INFO] Status:"
 docker compose -f docker-compose.cloudflare.yml ps
 
 echo "[INFO] Access endpoints:"
-echo "  - Admin   : https://${GOPHISH_ADMIN_DOMAIN}"
+echo "  - Admin   : https://${GOPHISH_ADMIN_DOMAIN}:8443"
 echo "  - Landing : https://${GOPHISH_LANDING_DOMAIN}"
 
 echo "[INFO] Initial password (if first run):"

@@ -6,6 +6,7 @@ services:
     container_name: gophish-lab
     restart: unless-stopped
     ports:
+      - "8443:8443"
       - "443:443"
       - "80:80"
     networks:
