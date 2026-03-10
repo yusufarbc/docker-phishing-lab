@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333333;
+    line-height: 1.6;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+  }
+  .container {
+    max-width: 600px;
+    margin: 20px auto;
+    background-color: #ffffff;
+    border: 1px solid #dddddd;
+    border-top: 4px solid #0078D4; /* Microsoft Blue */
+  }
+  .header {
+    padding: 20px;
+    border-bottom: 1px solid #eeeeee;
+  }
+  .header img {
+    height: 30px;
+  }
+  .content {
+    padding: 30px 20px;
+  }
+  h2 {
+    color: #333333;
+    font-size: 20px;
+    margin-top: 0;
+  }
+  .button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #0078D4;
+    color: #ffffff !important;
+    text-decoration: none;
+    border-radius: 3px;
+    font-weight: bold;
+    margin: 20px 0;
+  }
+  .footer {
+    padding: 15px 20px;
+    background-color: #f8f8f8;
+    color: #777777;
+    font-size: 12px;
+    text-align: center;
+    border-top: 1px solid #eeeeee;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <strong style="color: #0078D4; font-size: 24px;">IT Destek & Güvenlik</strong>
+    </div>
+    <div class="content">
+      <h2>Hesap Şifre Süreniz Dolmak Üzere</h2>
+      <p>Sayın <strong>{{.FirstName}} {{.LastName}}</strong>,</p>
+      <p>Kurumsal e-posta ve Microsoft 365 hesabınızın parola geçerlilik süresi <strong>24 saat</strong> içinde dolacaktır. Erişim kesintisi yaşamamak ve güncel güvenlik ilkelerine uymak için lütfen mevcut parolanızı doğrulayın veya güncelleyin.</p>
+      
+      <p>Aşağıdaki bağlantıya tıklayarak güvenli şifre yenileme ve doğrulama portalına erişebilirsiniz:</p>
+      
+      <a href="{{.URL}}" class="button">Hesabımı Doğrula / Şifremi Koru</a>
+      
+      <p>Eğer bu işlemi belirtilen süre içinde tamamlamazsanız, hesap erişiminiz güvenlik amacıyla geçici olarak askıya alınacaktır.</p>
+      <p>Teşekkür ederiz,<br>Bilgi İşlem Departmanı</p>
+    </div>
+    <div class="footer">
+      Bu mesaj otomatik olarak gönderilmiştir. Lütfen bu e-postaya yanıt vermeyiniz.<br>
+      © 2026 Bilgi Teknolojileri ve Güvenlik Yönetimi. Tüm hakları saklıdır.
+    </div>
+  </div>
+  {{.Tracker}}
+</body>
+</html>
