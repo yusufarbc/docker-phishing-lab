@@ -107,7 +107,11 @@ trusted_origins = [
     f'https://{admin}',
     f'http://{admin}',
     f'https://{landing}',
-    f'http://{landing}'
+    f'http://{landing}',
+    f'https://{admin}:443',
+    f'http://{admin}:443',
+    f'{admin}',
+    f'{admin}:443'
 ]
 
 data['admin_server']['use_tls'] = True
