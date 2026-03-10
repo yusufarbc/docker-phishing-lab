@@ -35,15 +35,15 @@ docker compose up -d
 
 echo "[INFO] Configuring Gophish for reverse proxy mode..."
 docker compose exec gophish sh -lc "sed -i -E 's/\"use_tls\": *true/\"use_tls\": false/' /opt/gophish/config.json"
-docker compose exec gophish sh -lc "sed -i -E 's#\"trusted_origins\": *\[[^]]*\]#\"trusted_origins\": [\"https://${GOPHISH_ADMIN_DOMAIN}:8443\",\"https://${GOPHISH_ADMIN_DOMAIN}\"]#' /opt/gophish/config.json || true"
+docker compose exec gophish sh -lc "sed -i -E 's#\"trusted_origins\": *\[[^]]*\]#\"trusted_origins\": [\"https://${GOPHISH_ADMIN_DOMAIN}\",\"https://${GOPHISH_ADMIN_DOMAIN}:443\",\"http://${GOPHISH_ADMIN_DOMAIN}\",\"http://${GOPHISH_ADMIN_DOMAIN}:80\",\"https://${GOPHISH_LANDING_DOMAIN}\",\"https://${GOPHISH_LANDING_DOMAIN}:443\"]#' /opt/gophish/config.json || true"
 docker compose restart gophish caddy >/dev/null
 
 echo "[INFO] Status:"
 docker compose ps
 
 echo "[INFO] Access endpoints:"
-echo "  - Gophish admin  : https://${GOPHISH_ADMIN_DOMAIN}:8443"
-echo "  - Gophish landing: https://${GOPHISH_LANDING_DOMAIN}:8443"
+echo "  - Gophish admin  : https://${GOPHISH_ADMIN_DOMAIN}"
+echo "  - Gophish landing: https://${GOPHISH_LANDING_DOMAIN}"
 
 echo "[INFO] Attempting to extract Gophish initial password from logs..."
 

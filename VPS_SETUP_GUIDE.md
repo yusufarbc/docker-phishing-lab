@@ -45,16 +45,16 @@ GOPHISH_LANDING_DOMAIN=kampanya.domain.com
 
 ## 4) Port ve Güvenlik Duvarı Ayarları (Kritik)
 
-Bu projenin Caddy yapılandırmasında port `8443` kullanılmaktadır. VPS sağlayıcınızın panelinden (AWS, DigitalOcean, Hetzner, vb.) ve sunucu içinden şu portları açın:
+Bu projenin Caddy yapılandırmasında standart HTTPS portu `443` kullanılmaktadır. VPS sağlayıcınızın panelinden (AWS, DigitalOcean, Hetzner, vb.) ve sunucu içinden şu portları açın:
 
 - `80/tcp`: Caddy'nin SSL (ACME) sertifikası alabilmesi için şarttır.
-- `8443/tcp`: Panellere erişim için kullanılacak tek port.
+- `443/tcp`: Panellere erişim için kullanılacak tek port.
 - `22/tcp`: SSH erişimi.
 
 Sunucu içinde (ufw kullanılıyorsa):
 ```bash
 sudo ufw allow 80/tcp
-sudo ufw allow 8443/tcp
+sudo ufw allow 443/tcp
 sudo ufw allow 22/tcp
 sudo ufw enable
 ```
@@ -82,10 +82,27 @@ docker compose logs gophish | grep password
 ```
 
 **Erişim Linkleri:**
-- **Yönetim Paneli:** `https://yonetim.domain.com:8443`
-- **Landing (Kurban) Sayfası:** `https://kampanya.domain.com:8443`
+- **Yönetim Paneli:** `https://yonetim.domain.com`
+- **Landing (Kurban) Sayfası:** `https://kampanya.domain.com`
 
 *Not: İlk girişte Caddy sertifika alırken bir kaç saniye gecikme olabilir. SSL hatası alırsanız biraz bekleyip sayfayı yenileyin.*
+
+### Sorun Giderme: `Forbidden - referer invalid`
+
+Bu hata genelde Gophish `trusted_origins` listesi ile giriş yaptığınız URL birebir eşleşmediğinde oluşur.
+
+1. Sadece şu adresten giriş yapın:
+`https://GOPHISH_ADMIN_DOMAIN`
+
+2. VPS üzerinde `trusted_origins` değerini güncelleyin:
+
+```bash
+docker compose exec gophish sh -lc "sed -i -E 's#\"trusted_origins\": *\[[^]]*\]#\"trusted_origins\": [\"https://${GOPHISH_ADMIN_DOMAIN}:8443\",\"https://${GOPHISH_ADMIN_DOMAIN}\",\"http://${GOPHISH_ADMIN_DOMAIN}:8443\",\"http://${GOPHISH_ADMIN_DOMAIN}\",\"https://${GOPHISH_LANDING_DOMAIN}:8443\",\"https://${GOPHISH_LANDING_DOMAIN}\"]#' /opt/gophish/config.json"
+docker compose exec gophish sh -lc "sed -i -E 's#\"trusted_origins\": *\[[^]]*\]#\"trusted_origins\": [\"https://${GOPHISH_ADMIN_DOMAIN}\",\"https://${GOPHISH_ADMIN_DOMAIN}:443\",\"http://${GOPHISH_ADMIN_DOMAIN}\",\"http://${GOPHISH_ADMIN_DOMAIN}:80\",\"https://${GOPHISH_LANDING_DOMAIN}\",\"https://${GOPHISH_LANDING_DOMAIN}:443\"]#' /opt/gophish/config.json"
+docker compose restart gophish caddy
+```
+
+3. Tarayıcıda bu domain için cache/cookie temizleyip tekrar giriş yapın.
 
 ## 7) Gophish İçinde Gönderim Profili (SMTP)
 
