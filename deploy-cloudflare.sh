@@ -52,30 +52,33 @@ fi
 
 missing_files=0
 
-if [[ ! -f "${CLOUDFLARE_ORIGIN_CERT_PATH}" ]]; then
+# Check if file doesn't exist OR if it's completely empty (0 bytes) OR contains the placeholder text.
+if [[ ! -s "${CLOUDFLARE_ORIGIN_CERT_PATH}" ]] || grep -q 'PASTE_CLOUDFLARE_' "${CLOUDFLARE_ORIGIN_CERT_PATH}"; then
   cat > "${CLOUDFLARE_ORIGIN_CERT_PATH}" <<'EOF'
 -----BEGIN CERTIFICATE-----
 PASTE_CLOUDFLARE_ORIGIN_CERTIFICATE_HERE
 -----END CERTIFICATE-----
 EOF
-  echo "[WARN] Origin certificate file was missing. Placeholder created: ${CLOUDFLARE_ORIGIN_CERT_PATH}"
+  echo "[WARN] Origin certificate was missing or empty. Placeholder created: ${CLOUDFLARE_ORIGIN_CERT_PATH}"
   missing_files=1
 fi
 
-if [[ ! -f "${CLOUDFLARE_ORIGIN_KEY_PATH}" ]]; then
+if [[ ! -s "${CLOUDFLARE_ORIGIN_KEY_PATH}" ]] || grep -q 'PASTE_CLOUDFLARE_' "${CLOUDFLARE_ORIGIN_KEY_PATH}"; then
   cat > "${CLOUDFLARE_ORIGIN_KEY_PATH}" <<'EOF'
 -----BEGIN PRIVATE KEY-----
 PASTE_CLOUDFLARE_ORIGIN_PRIVATE_KEY_HERE
 -----END PRIVATE KEY-----
 EOF
   chmod 600 "${CLOUDFLARE_ORIGIN_KEY_PATH}" || true
-  echo "[WARN] Origin private key file was missing. Placeholder created: ${CLOUDFLARE_ORIGIN_KEY_PATH}"
+  echo "[WARN] Origin private key was missing or empty. Placeholder created: ${CLOUDFLARE_ORIGIN_KEY_PATH}"
   missing_files=1
 fi
 
 if [[ "${missing_files}" -eq 1 ]]; then
-  echo "[ERROR] Cloudflare Origin cert/key placeholders were created."
-  echo "        Replace placeholder content with real PEM values, then run script again."
+  echo "[ERROR] Cloudflare Origin cert/key are missing, empty, or contain placeholders."
+  echo "        Replace the placeholder content in the files below with real PEM values, then run script again:"
+  echo "        - ${CLOUDFLARE_ORIGIN_CERT_PATH}"
+  echo "        - ${CLOUDFLARE_ORIGIN_KEY_PATH}"
   exit 1
 fi
 
