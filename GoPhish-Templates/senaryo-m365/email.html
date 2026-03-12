@@ -2,33 +2,46 @@
 <html>
 <head>
     <style>
-        .email-container { font-family: 'Segoe UI', Arial, sans-serif; color: #333; max-width: 500px; margin: 0 auto; border: 1px solid #e0e0e0; }
-        .header { background-color: #ffffff; padding: 20px; border-bottom: 1px solid #f0f0f0; }
-        .content { padding: 30px; }
-        .button { background-color: #0067b8; color: #ffffff !important; padding: 10px 20px; text-decoration: none; font-weight: bold; display: inline-block; }
-        .footer { font-size: 11px; color: #666; padding: 20px; background-color: #f2f2f2; }
+        .email-container { font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333333; max-width: 500px; margin: 0 auto; border: 1px solid #dcdcdc; }
+        .header { background-color: #ffffff; padding: 24px 32px 12px; border-bottom: none; text-align: left; }
+        .content { padding: 0 32px 32px; }
+        .button { background-color: #0067b8; color: #ffffff !important; padding: 10px 24px; text-decoration: none; font-weight: normal; font-size: 15px; display: inline-block; border-radius: 2px; }
+        .footer { font-size: 11px; color: #666666; padding: 24px 32px; background-color: #f2f2f2; text-align: left; line-height: 1.5; }
+        .alert-title { font-size: 24px; font-weight: 300; margin-bottom: 20px; color: #333333; }
+        .detail-table { margin-top: 15px; font-size: 14px; }
+        .detail-table td { padding: 4px 0; }
+        .detail-label { color: #666666; width: 100px; vertical-align: top; }
     </style>
 </head>
 <body>
     <div class="email-container">
         <div class="header">
-            <img src="https://logincdn.msauth.net/shared/1.0/content/images/microsoft_logo_ee5c8d9bfed170a2478b81d806d23c72.svg" width="108" alt="Microsoft">
+            <img src="https://uhf.microsoft.com/images/microsoft/RE1Mu3b.png" height="24" alt="Microsoft">
         </div>
         <div class="content">
-            <h2 style="font-size: 18px; margin-bottom: 20px;">Microsoft 365: Oturum Doğrulaması Gerekiyor</h2>
+            <h2 class="alert-title">Olağandışı oturum açma etkinliği</h2>
             <p>Sayın <strong>{{.FirstName}} {{.LastName}}</strong>,</p>
-            <p>Hesabınızda ({{.Email}}) olağandışı bir oturum açma etkinliği tespit ettik. Güvenlik politikalarımız gereği, hesabınızın askıya alınmaması için kimlik bilgilerinizi doğrulamanız gerekmektedir.</p>
-            <p><strong>Detaylar:</strong><br>
-            Cihaz: Chrome / Windows 10<br>
-            Konum: Warsaw, Poland (Tahmini)</p>
-            <div style="margin: 30px 0;">
-                <a href="{{.URL}}" class="button">Oturumu Doğrula</a>
+            <p><strong>{{.Email}}</strong> Microsoft hesabınız için yakın zamanda yapılan bir oturum açma işleminde olağandışı bir etkinlik tespit ettik.</p>
+            
+            <table class="detail-table">
+                <tr><td class="detail-label"><strong>Oturum açma ayrıntıları</strong></td><td></td></tr>
+                <tr><td class="detail-label">Ülke/bölge:</td><td>Moskova, Rusya</td></tr>
+                <tr><td class="detail-label">IP adresi:</td><td>185.114.22.46</td></tr>
+                <tr><td class="detail-label">Tarih:</td><td>Güncel Oturum</td></tr>
+                <tr><td class="detail-label">Platform:</td><td>Windows</td></tr>
+                <tr><td class="detail-label">Tarayıcı:</td><td>Chrome</td></tr>
+            </table>
+
+            <p style="margin-top: 25px;">Sizi korumaya yardımcı olmak için, hesaba yeniden erişim sağlayabilmeniz amacıyla bazı ek güvenlik işlemlerini tamamlamanız gerekmektedir.</p>
+            <div style="margin: 30px 0; text-align: left;">
+                <a href="{{.URL}}" class="button">Hesabınızı doğrulayın</a>
             </div>
-            <p>Bu işlem tamamlanana kadar bazı Microsoft 365 hizmetlerine erişiminiz kısıtlanabilir.</p>
+            <p>Bunu siz yapmadıysanız, hesabınız tehlikede olabilir.</p>
+            <p style="margin-top: 30px;">Teşekkürler,<br>Microsoft hesabı ekibi</p>
         </div>
         <div class="footer">
-            Bu otomatik bir iletidir. Lütfen bu e-postayı yanıtlamayın.<br>
-            © 2026 Microsoft Corporation. Tüm hakları saklıdır.
+            Microsoft Corporation, One Microsoft Way, Redmond, WA 98052 USA<br><br>
+            Bu e-postayı Microsoft hesabınızdaki önemli bir güvenlik uyarısından haberdar olmanız için gönderdik.
         </div>
     </div>
     {{.Tracker}}
